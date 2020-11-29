@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Button } from "@material-ui/core"
+import { Box, Button, IconButton } from "@material-ui/core"
+import { CgTrash } from "react-icons/cg";
+
+import GridContainer from "../components/GridContainer";
+import GridItem from "../components/GridItem";
 
 const ListPage = () => {
     // 비동기처리 취소용 객체
@@ -44,22 +48,37 @@ const ListPage = () => {
     }
 
     return (
-      <>
-        <Box fontSize={32} fontWeight={700}>Todo-List</Box>
-        <Box>
+        <Box margin="5rem">
+        <GridContainer justify="center" >
+            <GridItem xs={6}>
+                <Box fontSize={32} fontWeight={700} textAlign="center" marginBottom="1rem" borderBottom={1}>Todo-List</Box>
+            </GridItem>
+        </GridContainer>
+        <GridContainer justify="center">
             {
                 todoList.map( (todo, idx) => 
-                    <>
-                        <Box border={1} key={idx}>
-                            { `- ${idx+1} : ${ todo.title } (${ todo.content })`}
-                            <Button style={{ color: "red" }} name={idx} onClick={onClickDeleteTodo}>메모 삭제</Button>
-                        </Box>
-                    </>
+                    <GridItem xs={12} style={{ border: "1px #777777 solid", borderTop: (!idx) ? "1px #777777 solid" : "0px" }} key={idx}>
+                        <GridContainer justify="space-between" alignItems="center" style={{ padding: "10px" }}>
+                            <GridItem>
+                            <Box id={`todoItem-${idx}`}>
+                                { `- ${ todo.title } (${ todo.content })`}
+                            </Box>
+                            </GridItem>
+                            <GridItem>
+                            {
+                                <IconButton  aria-label="delete todo" component="span">
+                                    <CgTrash color="red" />
+                                </IconButton>
+                            }
+                            </GridItem>
+                        </GridContainer>
+                    </GridItem>
                 )
             }
+            <Button onClick={onClickAddTodo}>메모 추가</Button>
+
+        </GridContainer>
         </Box>
-        <Button onClick={onClickAddTodo}>메모 추가</Button>
-      </>
     );
 }
 
