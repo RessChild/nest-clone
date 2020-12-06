@@ -16,8 +16,9 @@ export class TodoController {
         this.todo.addTodo(t);
     }
 
-    @Delete('/remove/:id')
-    removeTodo(@Param('id') num: string) {
+    @Delete('/remove/:idx')
+    removeTodo(@Param('idx') num: string) {
+        console.log(num);
         this.todo.removeTodo(Number(num));
     }
 }
