@@ -1,22 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { Todo } from './entities/todo.entity';
+import { User } from "./entities/users.entity";
 
 @Injectable() // 작업을 수행할 함수
 export class TodoService {
-    private todos: Todo[] = [];
+    private todos: User<Todo> = {};
 
-    getTodos(): Todo[] {
-        return this.todos;
+    // 리스트 출력
+    getTodos(user: string): Todo[] {
+        return this.todos[user] || [];
     }
 
-    addTodo(t: Todo) {
-        this.todos.push(t);
+    // 리스트 추가
+    addTodo(user: string, t: Todo) {
+        this.todos[user] = [ ...(this.todos[user] || []), t ];
     }
 
-    removeTodo(num: number) {
-        this.todos = this.todos.filter( (todo,idx) => idx !== num );
+    // 리스트 제거
+    removeTodo(user: string, num: number) {
+        this.todos[user] = this.todos[user].filter( (todo,idx) => idx !== num );
     }
-    // getTodo(): Todo {
-    //     return null;
-    // }
 }

@@ -1,11 +1,18 @@
 import logo from './logo.svg';
 import './App.css';
+import { Redirect, Route } from "react-router-dom";
 import ListPage from './ListPage/ListPage';
+import LoginPage from './LoginPage/LoginPage';
 
 function App() {
 
+  // 각 주소와 컴포넌트 연결
   return (
-    <ListPage />
+    <>
+      <Route path="/login" component={LoginPage} />
+      <Route path="/list" component={ListPage} />
+      <Redirect path="/" to="/login" />
+    </>
   );
 }
 

@@ -9,7 +9,7 @@ import { CgTrash } from "react-icons/cg";
 import GridContainer from "../components/GridContainer";
 import GridItem from "../components/GridItem";
 
-const ListPage = () => {
+const ListPage = ({ id }) => {
     // 비동기처리 취소용 객체
     const cancelToken = axios.CancelToken;
     const source = cancelToken.source();
@@ -20,7 +20,7 @@ const ListPage = () => {
     // axios 로 리스트 불러오기 ( 리스트 수정이 일어나면 반복 호출 )
     // 다만, 1인 사용의 경우, 네트워크 통신을 최소화 하기 위해 직접 수정 
     const searchList = () => {
-        axios.get('/api/todo-list', { cancelToken: source.token })
+        axios.post('/api/todo-list', { user: id }, { cancelToken: source.token })
             .then( ({ data }) => {
                 console.log(data);
                 setTodoList(data);
@@ -39,7 +39,7 @@ const ListPage = () => {
     // 할일 추가
     const onClickAddTodo = () => {
         if(!newTodo.trim()) return alert("할 일을 작성해주세요.");
-        axios.post('/api/todo-list/add', { content: newTodo.trim() }, { cancelToken: source.token })
+        axios.post('/api/todo-list/add', { user: id, content: newTodo.trim() }, { cancelToken: source.token })
             .then( ans => {
                 setTodoList([ ...todoList, { content: newTodo }]); // 할일을 리스트에 삽입
                 setNewTodo(''); // 비우기
@@ -51,7 +51,7 @@ const ListPage = () => {
     const onClickDeleteTodo = ({ currentTarget: { id }}) => {
         if( window.confirm("선택한 메모를 삭제합니다.")){
             const [ target, idx ] = id.split('-');
-            axios.delete(`/api/todo-list/remove/${idx}`)
+            axios.post(`/api/todo-list/remove/${idx}`, { user: id }, { cancelToken: source.token })
                 .then( ans => setTodoList(todoList.filter( (todo, t_idx) => t_idx !== Number(idx) )) )
                 .catch( e => { if(!axios.isCancel(e)) alert("error", e) });
         }
@@ -61,7 +61,7 @@ const ListPage = () => {
     const onChangeInput = ({ currentTarget: { value }}) => setNewTodo(value);
 
     return (
-        <Box width="50rem" margin="auto" marginTop="5rem">
+        <Box width="40rem" margin="auto" marginTop="5rem">
         <GridContainer justify="center" >
             <GridItem xs={6}>
                 <Box fontSize={32} fontWeight={700} textAlign="center" marginBottom="1rem" borderBottom={1}>Todo-List</Box>
