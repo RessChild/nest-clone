@@ -10,4 +10,10 @@ export class IdentifyController {
     requestLogin(@Body('id') id: string, @Body('pw') pw: string): Boolean {
        return this.identify.requestLogin(id, pw);
     }
+
+    // 회원가입 요청
+    @Post('/sign-up')
+    requestSignUp(@Body('id') id: string, @Body('pw') pw: string): Boolean {
+        return this.identify.requestSignUp(id, pw);
+    }
 }
