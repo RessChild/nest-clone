@@ -25,7 +25,7 @@ const ListPage = ({ location: { state: { id }}, history }) => {
     const searchList = () => {
         axios.post('/api/todo-list', { user: id }, { cancelToken: source.token })
             .then( ({ data }) => {
-                // console.log(data);
+                console.log(data);
                 setTodoList(data);
                 setIsLoading(false);
             })
@@ -53,7 +53,7 @@ const ListPage = ({ location: { state: { id }}, history }) => {
         if(!newTodo.trim()) return alert("할 일을 작성해주세요.");
         axios.post('/api/todo-list/add', { user: id, content: newTodo.trim() }, { cancelToken: source.token })
             .then( ans => {
-                setTodoList([ ...todoList, { content: newTodo }]); // 할일을 리스트에 삽입
+                setTodoList([ ...todoList, { todos: newTodo }]); // 할일을 리스트에 삽입
                 setNewTodo(''); // 비우기
             } )
             .catch( e => { if(!axios.isCancel(e)) alert("error", e) });
@@ -63,7 +63,7 @@ const ListPage = ({ location: { state: { id }}, history }) => {
     const onClickDeleteTodo = ({ currentTarget: { id }}) => {
         if( window.confirm("선택한 메모를 삭제합니다.")){
             const [ target, idx ] = id.split('-');
-            axios.post(`/api/todo-list/remove/${idx}`, { user: id }, { cancelToken: source.token })
+            axios.post(`/api/todo-list/remove`, todoList.find( (t,num) => num === Number(idx) ), { cancelToken: source.token })
                 .then( ans => setTodoList(todoList.filter( (todo, t_idx) => t_idx !== Number(idx) )) )
                 .catch( e => { if(!axios.isCancel(e)) alert("error", e) });
         }
@@ -78,7 +78,6 @@ const ListPage = ({ location: { state: { id }}, history }) => {
         setHover(parseInt(idx));
     }
     const onMouseLeaveBtn = () => {
-        console.log("out")
         setHover(-1);
     }
     return (
@@ -104,7 +103,7 @@ const ListPage = ({ location: { state: { id }}, history }) => {
                             <GridContainer justify="space-between" alignItems="center" style={{ padding: "10px", fontSize: "20px" }}>
                                 <GridItem>
                                 <Box height="3rem" lineHeight="3rem" id={`todoItem-${idx}`}>
-                                    { `- ${ todo.content }`}
+                                    { `- ${ todo.todos }`}
                                 </Box>
                                 </GridItem>
                                 <GridItem>

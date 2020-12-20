@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { User } from 'src/identify/entities/user.entity';
+// import { User } from 'src/identify/entities/user.entity';
 import { Todo } from './entities/todo.entity';
 import { TodoService } from './todo.service';
 
@@ -8,18 +8,22 @@ export class TodoController {
     constructor(private readonly todo: TodoService) {}
 
     @Post()
-    getTodos(@Body() user: string){
-        return this.todo.getTodos(user);
+    async getTodos(@Body("user") user: string){
+        const result = await this.todo.getTodos(user);
+        console.log("todoList",result);
+        return result;
     }
 
     @Post('/add')
-    addTodo(@Body() user: string, @Body() t: Todo) {
-        this.todo.addTodo(user, t);
+    async addTodo(@Body("user") user: string, @Body("content") t: string) {
+        const result = await this.todo.addTodo(user, t);
+        console.log("add list", result);
+        return result;
     }
 
-    @Post('/remove/:idx')
-    removeTodo(@Body() user: string, @Param('idx') num: string) {
-        console.log(num);
-        this.todo.removeTodo(user, Number(num));
+    @Post('/remove')
+    removeTodo(@Body("id") id: string, @Body("todos") todos: string) {
+        // console.log(num);
+        this.todo.removeTodo(id, todos);
     }
 }

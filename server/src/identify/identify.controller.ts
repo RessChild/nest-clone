@@ -7,13 +7,17 @@ export class IdentifyController {
 
     // 로그인 요청
     @Post('/login')
-    requestLogin(@Body('id') id: string, @Body('pw') pw: string): Boolean {
-       return this.identify.requestLogin(id, pw);
+    async requestLogin(@Body('id') id: string, @Body('pw') pw: string) {
+        const result = await this.identify.requestLogin(id, pw);
+        console.log("request", result);
+        return result;
     }
 
     // 회원가입 요청
     @Post('/sign-up')
-    requestSignUp(@Body('id') id: string, @Body('pw') pw: string): Boolean {
-        return this.identify.requestSignUp(id, pw);
+    async requestSignUp(@Body('id') id: string, @Body('pw') pw: string) {
+        const result = await this.identify.requestSignUp(id, pw);
+        console.log("signup", result);
+        return result;
     }
 }

@@ -1,0 +1,10 @@
+{
+    "type": "mysql",
+    "host": "MY_HOST",
+    "port": "MY_PORT",
+    "username": "MY_ID",
+    "password": "MY_PW",
+    "database": "MY_DB",
+    "entities": ["./src/**/*.typeorm.ts"],
+    "synchronize": true
+  }
