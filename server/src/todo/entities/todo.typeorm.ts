@@ -1,12 +1,15 @@
 // 유저 DB 에 접근할 타입
 
-import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("todos")
 export class Todo extends BaseEntity {
-    @PrimaryColumn({ length: 12 })
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column({ length: 12 })
+    user: string;
     
-    @PrimaryColumn({ length: 50 })
+    @Column({ length: 50 })
     todos: string;
 }

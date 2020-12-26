@@ -24,3 +24,12 @@
 
 - forRoot 에 걍 설정정보 다 넣고, Entity 에 객체 넣어주니 됨.. 이유가 뭐지..
 - Argument of type '{ id: string; todos: string; }' is not assignable to parameter of type 'DeepPartial<Todo>'
+
+# 개선사항
+- import { ConfigModule } from '@nestjs/config';
+- https://docs.nestjs.com/techniques/configuration
+
+# 진행사항
+1. 수정 모드 추가 ( 12/26 일 )
+    - table 구조 변경 (PrimaryGeneratedColumn 사용)
+    - typeorm 의 update 활용

@@ -22,8 +22,17 @@ export class TodoController {
     }
 
     @Post('/remove')
-    removeTodo(@Body("id") id: string, @Body("todos") todos: string) {
+    removeTodo(@Body("id") id: string) {
         // console.log(num);
-        this.todo.removeTodo(id, todos);
+        const result = this.todo.removeTodo(parseInt(id));
+        console.log("remove list", result);
+        return result;
+    }
+
+    @Post('/edit')
+    editTodo(@Body("id") id: string, @Body("todos") todos: string) {
+        const result = this.todo.editTodo(parseInt(id), todos);
+        console.log("edit list", result);
+        return result;
     }
 }

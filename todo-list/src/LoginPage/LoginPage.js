@@ -23,7 +23,7 @@ const LoginPage = ({ history }) => {
             .then( ({ data }) => {
                 // console.log(data);
                 if( data ) { // 성공
-                    history.replace("/list", { id: id });
+                    history.replace("/list", { user: id });
                 }
                 else {
                     alert("실패");

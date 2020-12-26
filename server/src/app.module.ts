@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './identify/entities/user.typeorm';
 import { Todo } from './todo/entities/todo.typeorm';
 
-import "dotenv/config";
+import "dotenv/config"; // config module
 // dotenv.config();
 
 @Module({
@@ -23,6 +23,7 @@ import "dotenv/config";
           }
       },
       "entities": [User, Todo],
+      "synchronize": true, // 테이블 자동 생성
   }
   )],
   controllers: [],

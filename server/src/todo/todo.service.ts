@@ -15,18 +15,22 @@ export class TodoService {
     // 리스트 출력
     getTodos(user: string) {
         console.log( user );
-        return this.todosRepository.find({ where: { id: user }});
+        return this.todosRepository.find({ where: { user: user }});
     }
 
     // 리스트 추가
     addTodo(user: string, t: string) {
-        return this.todosRepository.create({ id: user, todos: t }).save();
+        return this.todosRepository.create({ user: user, todos: t }).save();
     }
 
     // 리스트 제거
-    removeTodo(id: string, todos: string) {
+    removeTodo(id: number) {
         // this.todos[user] = this.todos[user].filter( (todo,idx) => idx !== num );
         // return this.todosRepository.remove()
-        return this.todosRepository.delete({ id: id, todos: todos });
+        return this.todosRepository.delete({ id: id });
+    }
+
+    editTodo(id: number, todos: string) {
+        return this.todosRepository.update(id , { todos: todos });
     }
 }
