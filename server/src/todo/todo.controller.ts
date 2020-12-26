@@ -22,16 +22,16 @@ export class TodoController {
     }
 
     @Post('/remove')
-    removeTodo(@Body("id") id: string) {
+    async removeTodo(@Body("id") id: string) {
         // console.log(num);
-        const result = this.todo.removeTodo(parseInt(id));
+        const result = await this.todo.removeTodo(parseInt(id));
         console.log("remove list", result);
         return result;
     }
 
     @Post('/edit')
-    editTodo(@Body("id") id: string, @Body("todos") todos: string) {
-        const result = this.todo.editTodo(parseInt(id), todos);
+    async editTodo(@Body("id") id: string, @Body("todos") todos: string) {
+        const result = await this.todo.editTodo(parseInt(id), todos);
         console.log("edit list", result);
         return result;
     }
