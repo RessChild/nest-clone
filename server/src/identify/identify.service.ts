@@ -9,6 +9,7 @@ export class IdentifyService {
     constructor( // 생성자로 내부 변수 구축
         @InjectRepository(User)
         private readonly userRepository: UserRepository,
+        private jwtService: JwtService // JWT 용 객체
     ) {}
 
     // 로그인 요청 (사용자 확인)
@@ -35,5 +36,13 @@ export class IdentifyService {
             return others;
         }
         else null;
+    }
+
+    // jwt 생성 함수
+    async login(user: any) {
+        console.log(user);
+        return {
+            access_token: this.jwtService.sign(user),
+        }
     }
 }

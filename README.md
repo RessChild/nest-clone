@@ -35,11 +35,15 @@
 - npm install --save-dev @types/passport-local
     1. 로그인 구문에 passportStrayegy 클래스 생성
         ( 내부에 함수 validate 선언 필요 )
-    2. 상단 모듈에 passport 관련 선언
+    2. 상단 모듈에 passportModule 을 사용선언 
 
 # nestjs-JWT
 - npm install --save @nestjs/jwt passport-jwt
 - npm install --save-dev @types/passport-jwt
+    1. service 안에 JwtService 객체를 내부변수로 선언
+        - access_token 을 만들어 반환하는 함수를 선언 ( login() )
+        - 이때 JwtService 의 sign 함수를 사용하여 값을 만들어냄
+    2. 상단 모듈에 JWTModule 을 사용선언
 
 # 진행사항
 1. 수정 모드 추가 ( 12/26 )

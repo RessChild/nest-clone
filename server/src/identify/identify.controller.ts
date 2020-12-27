@@ -23,12 +23,14 @@ export class IdentifyController {
         return result;
     }
 
-    // local 권한 체크. validate 호출
+    // local 권한 체크. local.strategy.ts 의 validate 를 자동 호출
     @UseGuards(AuthGuard('local'))
     @Post('/req')
-    a(@Request() req) {
+    async passportWithJwt(@Request() req) {
         // req.user 로 인증 정보 접근 가능
-        console.log(req.user);
-        return req.user;
+
+        const jwt = await this.identify.login(req.user);
+        console.log(jwt);
+        return jwt;
     }
 }
