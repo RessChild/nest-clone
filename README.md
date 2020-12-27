@@ -29,7 +29,24 @@
 - import { ConfigModule } from '@nestjs/config';
 - https://docs.nestjs.com/techniques/configuration
 
+# nestjs-Passport
+- 참고 링크: https://docs.nestjs.com/security/authentication
+- npm install --save @nestjs/passport passport passport-local
+- npm install --save-dev @types/passport-local
+    1. 로그인 구문에 passportStrayegy 클래스 생성
+        ( 내부에 함수 validate 선언 필요 )
+    2. 상단 모듈에 passport 관련 선언
+
+# nestjs-JWT
+- npm install --save @nestjs/jwt passport-jwt
+- npm install --save-dev @types/passport-jwt
+
 # 진행사항
-1. 수정 모드 추가 ( 12/26 일 )
+1. 수정 모드 추가 ( 12/26 )
     - table 구조 변경 (PrimaryGeneratedColumn 사용)
     - typeorm 의 update 활용
+2. JWT 추가 시도 ( 12/27 )
+    - jwt 를 쓰기위해선 passport 가 반드시 필요한 것으로 보임 ( 기본 기능을 jwt passport 에서 제공하는 듯 )
+    - 초기 권한 설정이 아예 안먹는듯..? req.user 에 값이 안들어감
+      passport 가 인증에 사용할 변수명을 명확히 해야 함
+      validate 호출은 자동으로 진행됨

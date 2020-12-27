@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.typeorm';
 import { UserRepository } from './repositories/user.repository';
@@ -7,7 +8,7 @@ import { UserRepository } from './repositories/user.repository';
 export class IdentifyService {
     constructor( // 생성자로 내부 변수 구축
         @InjectRepository(User)
-        private readonly userRepository: UserRepository
+        private readonly userRepository: UserRepository,
     ) {}
 
     // 로그인 요청 (사용자 확인)
@@ -23,5 +24,16 @@ export class IdentifyService {
         // this.users.push({ id: id, pw: pw })
         // return true;
         return this.userRepository.create({ id: id, pw: pw }).save();
+    }
+
+    // passport 인증용 함수
+    async validate( id: string, pw: string ){
+        const result = await this.userRepository.findOne({ where: { id: id, pw: pw }});
+        if( result ) { // 사용자 정보가 있다면
+            // 비밀번호를 제외한 나머지 정보만 반환
+            const { pw, ...others } = result;
+            return others;
+        }
+        else null;
     }
 }

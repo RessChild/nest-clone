@@ -19,11 +19,13 @@ const LoginPage = ({ history }) => {
 
     // 로그인 요청
     const onClickLogin = () => {
-        axios.post('/api/identify/login', user)
+        // axios.post('/api/identify/login', user)
+        axios.post('/api/identify/req', user)
             .then( ({ data }) => {
                 // console.log(data);
                 if( data ) { // 성공
-                    history.replace("/list", { user: id });
+                    // history.replace("/list", { user: id });
+                    console.log(data);
                 }
                 else {
                     alert("실패");

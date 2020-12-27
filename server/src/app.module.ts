@@ -4,6 +4,7 @@ import { IdentifyModule } from './identify/identify.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './identify/entities/user.typeorm';
 import { Todo } from './todo/entities/todo.typeorm';
+import { AuthModule } from './auth/auth.module';
 
 import "dotenv/config"; // config module
 // dotenv.config();
@@ -25,7 +26,7 @@ import "dotenv/config"; // config module
       "entities": [User, Todo],
       "synchronize": true, // 테이블 자동 생성
   }
-  )],
+  ), AuthModule],
   controllers: [],
   providers: [],
 })
