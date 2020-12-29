@@ -40,7 +40,6 @@ export class IdentifyService {
 
     // jwt 생성 함수
     async login(user: any) {
-        console.log(user);
         return {
             access_token: this.jwtService.sign(user),
         }

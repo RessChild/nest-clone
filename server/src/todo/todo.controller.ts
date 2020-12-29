@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 // import { User } from 'src/identify/entities/user.entity';
 import { Todo } from './entities/todo.entity';
 import { TodoService } from './todo.service';
@@ -7,20 +8,25 @@ import { TodoService } from './todo.service';
 export class TodoController {
     constructor(private readonly todo: TodoService) {}
 
-    @Post()
-    async getTodos(@Body("user") user: string){
-        const result = await this.todo.getTodos(user);
+    @UseGuards(AuthGuard('jwt'))
+    @Get()
+    async getTodos(@Request() req){
+        const { user: { id }} = req;
+        const result = await this.todo.getTodos(id);
         console.log("todoList",result);
         return result;
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Post('/add')
-    async addTodo(@Body("user") user: string, @Body("content") t: string) {
-        const result = await this.todo.addTodo(user, t);
+    async addTodo(@Request() req, @Body("content") t: string) {
+        const { user: { id }} = req;
+        const result = await this.todo.addTodo(id, t);
         console.log("add list", result);
         return result;
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Post('/remove')
     async removeTodo(@Body("id") id: string) {
         // console.log(num);
@@ -29,6 +35,7 @@ export class TodoController {
         return result;
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Post('/edit')
     async editTodo(@Body("id") id: string, @Body("todos") todos: string) {
         const result = await this.todo.editTodo(parseInt(id), todos);

@@ -54,3 +54,6 @@
     - 초기 권한 설정이 아예 안먹는듯..? req.user 에 값이 안들어감
       passport 가 인증에 사용할 변수명을 명확히 해야 함
       validate 호출은 자동으로 진행됨
+    - jwt 토큰은 값을 받아 클라이언트에서 저장하다가, 헤더에 넣어서 전송해줘야함
+    - jwtStrategy의 validate가 작동 안한 이유는 토큰 자체가 없어서 막혔기 때문
+    - 실행 순서는 validate -> handleRequest 순서

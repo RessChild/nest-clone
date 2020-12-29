@@ -11,7 +11,7 @@ import GridContainer from "../components/GridContainer";
 import GridItem from "../components/GridItem";
 
 // 할일 목록 출력 페이지
-const ListPage = ({ location: { state: { user }}, history }) => {
+const ListPage = ({ location: { state: { user, access_token }}, history }) => {
     // 비동기처리 취소용 객체
     const cancelToken = axios.CancelToken;
     const source = cancelToken.source();
@@ -22,10 +22,12 @@ const ListPage = ({ location: { state: { user }}, history }) => {
     const [ newTodo, setNewTodo ] = useState('');
     const [ editList, setEditList ] = useState({});
 
+    const axiosHeader = { headers: { Authorization: `Bearer ${access_token}` }, cancelToken: source.token };
+
     // axios 로 리스트 불러오기 ( 리스트 수정이 일어나면 반복 호출 )
     // 다만, 1인 사용의 경우, 네트워크 통신을 최소화 하기 위해 직접 수정 
     const searchList = () => {
-        axios.post('/api/todo-list', { user: user }, { cancelToken: source.token })
+        axios.get('/api/todo-list', axiosHeader)
             .then( ({ data }) => {
                 console.log(data);
                 setTodoList(data);
@@ -53,7 +55,7 @@ const ListPage = ({ location: { state: { user }}, history }) => {
     // 할일 추가
     const onClickAddTodo = () => {
         if(!newTodo.trim()) return alert("할 일을 작성해주세요.");
-        axios.post('/api/todo-list/add', { user: user, content: newTodo.trim() }, { cancelToken: source.token })
+        axios.post('/api/todo-list/add', { content: newTodo.trim() }, axiosHeader)
             .then( ans => {
                 // setTodoList([ ...todoList, { todos: newTodo }]); // 할일을 리스트에 삽입
                 searchList();
@@ -66,7 +68,7 @@ const ListPage = ({ location: { state: { user }}, history }) => {
     const onClickDeleteTodo = ({ currentTarget: { id }}) => {
         if( window.confirm("선택한 메모를 삭제합니다.")){
             const [ target, idx ] = id.split('-');
-            axios.post(`/api/todo-list/remove`, { id: idx }, { cancelToken: source.token })
+            axios.post(`/api/todo-list/remove`, { id: idx }, axiosHeader )
                 .then( ans => setTodoList(todoList.filter( ({ id }) => id !== Number(idx) )) )
                 .catch( e => { if(!axios.isCancel(e)) alert("error", e) });
         }
@@ -91,7 +93,7 @@ const ListPage = ({ location: { state: { user }}, history }) => {
     }
     const onClickSend = ({ currentTarget: { id }}) => {
         const [ target, idx ] = id.split('-');
-        axios.post('/api/todo-list/edit', { id: idx, todos: editList[idx] }, { cancelToken: source.token })
+        axios.post('/api/todo-list/edit', { id: idx, todos: editList[idx] }, axiosHeader)
             .then( ans => { 
                 // searchList();
                 setTodoList(todoList.map( todo => todo.id !== parseInt(idx) ? todo : { ...todo, todos: editList[idx] }));
