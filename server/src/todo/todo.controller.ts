@@ -14,7 +14,10 @@ export class TodoController {
         const { user: { id }} = req;
         const result = await this.todo.getTodos(id);
         console.log("todoList",result);
-        return result;
+        return {
+            user: id,
+            todos: result,
+        };
     }
 
     @UseGuards(AuthGuard('jwt'))

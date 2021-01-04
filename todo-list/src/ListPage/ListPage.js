@@ -9,31 +9,74 @@ import { RiSendPlaneFill } from "react-icons/ri";
 
 import GridContainer from "../components/GridContainer";
 import GridItem from "../components/GridItem";
+import { useCookies } from "react-cookie";
+
+import jwt from "jsonwebtoken";
 
 // 할일 목록 출력 페이지
-const ListPage = ({ location: { state: { user, access_token }}, history }) => {
+const ListPage = ({ history }) => {
     // 비동기처리 취소용 객체
     const cancelToken = axios.CancelToken;
     const source = cancelToken.source();
 
+    const [ cookie, setCookie, removeCookie ] = useCookies(['access_token', 'refresh_token']);
+
+    const [ user, setUser ] = useState('');
     const [ hover, setHover ] = useState(-1);
     const [ isLoading, setIsLoading ] = useState(false);
     const [ todoList, setTodoList ] = useState([]);
     const [ newTodo, setNewTodo ] = useState('');
     const [ editList, setEditList ] = useState({});
 
-    const axiosHeader = { headers: { Authorization: `Bearer ${access_token}` }, cancelToken: source.token };
+    const axiosHeader = { headers: { Authorization: `Bearer ${cookie["access_token"]}` }, cancelToken: source.token };
+    const axiosHeader_R = { headers: { Authorization: `Bearer ${cookie["refresh_token"]}` }, cancelToken: source.token };
+
+    const getNewAccessToken = async () => {
+        // console.log("refresh_token:", cookie["refresh_token"]);
+        try {
+            const { data, status } = await axios.post('/api/identify/new-token', {}, axiosHeader_R)
+
+            if( 200 < status && status < 300 ) {
+                console.log("new-token", data);
+                setCookie("access_token", data["access_token"]);
+                return true;
+            }
+        } catch (e) {
+            if( axios.isCancel(e) ) return;
+            console.log(e);
+            return false;
+        }
+            // .then( ({ data }) => {
+            //   console.log("new-token", data);
+            //   setCookie("access_token", data["access_token"]);
+            //   alert("토큰 갱신");
+            //   return true;
+            // })
+            // .catch( e => {
+            //     // if(axios.isCancel(e)) return;
+            //     return false;
+            // })
+    }
 
     // axios 로 리스트 불러오기 ( 리스트 수정이 일어나면 반복 호출 )
     // 다만, 1인 사용의 경우, 네트워크 통신을 최소화 하기 위해 직접 수정 
-    const searchList = () => {
-        axios.get('/api/todo-list', axiosHeader)
-            .then( ({ data }) => {
-                console.log(data);
-                setTodoList(data);
-                setIsLoading(false);
-            })
-            .catch( e => { if(!axios.isCancel(e)) alert("error", e) });
+    const searchList = async () => {
+        if(await checkExpired()) {
+            axios.get('/api/todo-list', axiosHeader)
+                .then( ({ data }) => {
+                    console.log(data);
+                    setTodoList(data.todos);
+                    setUser(data.user);
+                    setIsLoading(false);
+                })
+                .catch( e => { 
+                    // 취소로 인한 에러는 무시
+                    if(axios.isCancel(e)) return;
+                    if( e.response.status === 401 ) return getNewAccessToken();
+                    // console.log(e);
+                    alert("error", e);
+                });
+        }
     }
 
     // 초기화
@@ -45,32 +88,63 @@ const ListPage = ({ location: { state: { user, access_token }}, history }) => {
         }
     }, [])
 
+    // 토큰 만료기간 체크, 갱신
+    const checkExpired = async (target = "access_token") => {
+        const { payload: { exp }} = jwt.decode(cookie[target], {complete: true});
+        const date = new Date();
+
+        // 5초 정도의 시간간격 필요
+        if( exp * 1000 < date.getTime() + 5000 ){
+            console.log("token is expired");
+            return await getNewAccessToken();
+        }
+        return true;
+    }
+
     // 로그아웃
     const onClickLogOut = () => {
         if(window.confirm("로그인 페이지로 이동합니다.")){
+            removeCookie('access_token');
+            removeCookie('refresh_token');
             history.replace('/login');
         }
     }
 
     // 할일 추가
-    const onClickAddTodo = () => {
+    const onClickAddTodo = async () => {
         if(!newTodo.trim()) return alert("할 일을 작성해주세요.");
-        axios.post('/api/todo-list/add', { content: newTodo.trim() }, axiosHeader)
-            .then( ans => {
-                // setTodoList([ ...todoList, { todos: newTodo }]); // 할일을 리스트에 삽입
-                searchList();
-                setNewTodo(''); // 비우기
-            } )
-            .catch( e => { if(!axios.isCancel(e)) alert("error", e) });
+        if (await checkExpired()) {
+            axios.post('/api/todo-list/add', { content: newTodo.trim() }, axiosHeader)
+                .then( ans => {
+                    // setTodoList([ ...todoList, { todos: newTodo }]); // 할일을 리스트에 삽입
+                    searchList();
+                    setNewTodo(''); // 비우기
+                } )
+                .catch( e => { 
+                    // 취소로 인한 에러는 무시
+                    if(axios.isCancel(e)) return;
+                    if( e.response.status === 401 ) return getNewAccessToken();
+                    // console.log(e);
+                    alert("error", e);
+                });
+        }
     }
 
     // 할일 삭제
-    const onClickDeleteTodo = ({ currentTarget: { id }}) => {
+    const onClickDeleteTodo = async ({ currentTarget: { id }}) => {
         if( window.confirm("선택한 메모를 삭제합니다.")){
-            const [ target, idx ] = id.split('-');
-            axios.post(`/api/todo-list/remove`, { id: idx }, axiosHeader )
-                .then( ans => setTodoList(todoList.filter( ({ id }) => id !== Number(idx) )) )
-                .catch( e => { if(!axios.isCancel(e)) alert("error", e) });
+            if(await checkExpired()) {
+                const [ target, idx ] = id.split('-');
+                axios.post(`/api/todo-list/remove`, { id: idx }, axiosHeader )
+                    .then( ans => setTodoList(todoList.filter( ({ id }) => id !== Number(idx) )) )
+                    .catch( e => { 
+                        // 취소로 인한 에러는 무시
+                        if(axios.isCancel(e)) return;
+                        if( e.response.status === 401 ) getNewAccessToken();
+                        // console.log(e);
+                        alert("error", e);
+                    });
+            }
         }
     }
 
@@ -91,15 +165,17 @@ const ListPage = ({ location: { state: { user, access_token }}, history }) => {
             setEditList({ ...editList, [idx]: null });
         }
     }
-    const onClickSend = ({ currentTarget: { id }}) => {
-        const [ target, idx ] = id.split('-');
-        axios.post('/api/todo-list/edit', { id: idx, todos: editList[idx] }, axiosHeader)
-            .then( ans => { 
-                // searchList();
-                setTodoList(todoList.map( todo => todo.id !== parseInt(idx) ? todo : { ...todo, todos: editList[idx] }));
-                setEditList({ ...editList, [idx]: null });
-            })
-            .catch( e => { if(!axios.isCancel(e)) alert("error", e) });
+    const onClickSend = async ({ currentTarget: { id }}) => {
+        if(await checkExpired()) {
+            const [ target, idx ] = id.split('-');
+            axios.post('/api/todo-list/edit', { id: idx, todos: editList[idx] }, axiosHeader)
+                .then( ans => { 
+                    // searchList();
+                    setTodoList(todoList.map( todo => todo.id !== parseInt(idx) ? todo : { ...todo, todos: editList[idx] }));
+                    setEditList({ ...editList, [idx]: null });
+                })
+                .catch( e => { if(!axios.isCancel(e)) alert("error", e) });
+        }
     }
 
     // 신규 할일

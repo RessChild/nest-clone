@@ -57,3 +57,22 @@
     - jwt 토큰은 값을 받아 클라이언트에서 저장하다가, 헤더에 넣어서 전송해줘야함
     - jwtStrategy의 validate가 작동 안한 이유는 토큰 자체가 없어서 막혔기 때문
     - 실행 순서는 validate -> handleRequest 순서
+3. 참고자료
+    - https://velog.io/@tlatldms/%EC%84%9C%EB%B2%84%EA%B0%9C%EB%B0%9C%EC%BA%A0%ED%94%84-Refresh-JWT-%EA%B5%AC%ED%98%84
+    - jwt 토큰을 재생성하는데 refresh 토큰이란걸 쓰는게 보편적인 것 같음
+    - 그러니까 2 종류의 토큰을 보유 ( access_token, refresh_token )
+    - location 정보로 넘기는 정보를 cookie 나 localstorage 정보로 옮길 것
+    - jwtModule 내에 선언해주는건 기본값.
+        생성되는 토큰마다 고유값이 다른 경우, options 으로 직접 기재할 수 있음
+4. react-cookie
+    - https://m.blog.naver.com/PostView.nhn?blogId=dilrong&logNo=221450777898&proxyReferer=https:%2F%2Fwww.google.com%2F
+    - npm i react-cookie --save
+    - cookie 의 경우, 브라우저가 완전히 종료되면 없어짐
+    ( 자동로그인을 구현할려면, localstorage 를 쓰는게 맞는 듯 )
+5. Refresh_token 의 필요여부는 사람마다 의견이 다른 듯
+    - https://zzossig.io/posts/etc/what_is_the_point_of_refresh_token/
+6. 클라이언트에서 jwt 해독을 위한 모듈 불러오기
+    - npm i jsonwebtoken --save
+    - 이후 exp 비교하면서 시간 널널하게 비교.
+        만료된 토큰이면 새 토큰을 받아오고 실행
+        다만.. 이게 useState 도 비동기로 적용되는거라서, 이미 토큰 기한이 만료된경우엔 에러창뜸

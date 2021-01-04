@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { jwtConstants } from "../constants";
 import { User } from './entities/user.typeorm';
 import { UserRepository } from './repositories/user.repository';
 
@@ -41,7 +42,15 @@ export class IdentifyService {
     // jwt 생성 함수
     async login(user: any) {
         return {
-            access_token: this.jwtService.sign(user),
+            access_token: this.jwtService.sign(user, { secret: jwtConstants.secret, expiresIn: "15s" }),
+            refresh_token: this.jwtService.sign(user, { secret: jwtConstants.refresh, expiresIn: "1h" }),
+        }
+    }
+
+    // jwt 재발급
+    async refreshJwt(user: any) {
+        return {
+            access_token: this.jwtService.sign(user, { secret: jwtConstants.secret, expiresIn: "15s" }),
         }
     }
 }

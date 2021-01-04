@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import GridContainer from "../components/GridContainer";
 import GridItem from "../components/GridItem";
@@ -6,9 +6,13 @@ import { Box, Button, TextField } from "@material-ui/core";
 import { useState } from "react";
 
 import { RiArrowRightLine } from "react-icons/ri";
+import { useCookies } from "react-cookie";
 
 const LoginPage = ({ history }) => {
 
+    const source = axios.CancelToken.source();
+
+    const [ cookie, setCookie, removeCookie ] = useCookies(['access_token', 'refresh_token']);
     const [ user, setUser ] = useState({ id: '', pw: '' });
     const { id, pw } = user;
 
@@ -17,15 +21,28 @@ const LoginPage = ({ history }) => {
         setUser({ ...user, [name]: value });
     }
 
+    useEffect(() => {
+        // 이미 로그인 정보가 있으면, 이동
+        if( cookie["access_token"] && cookie["refresh_token"] ) {
+            console.log("cookie info::", cookie);
+            history.replace("/list");
+        }
+        return () => {
+            source.cancel();
+        }
+    }, []);
+
     // 로그인 요청
     const onClickLogin = () => {
-        axios.post('/api/identify/login', user)
+        axios.post('/api/identify/login', user, { cancelToken: source.token })
         // axios.post('/api/identify/req', user)
             .then( ({ data }) => {
-                console.log(data);
+                // console.log(data);
                 if( data ) { // 성공
-                    history.replace("/list", { user: id, ...data });
                     // console.log(data);
+                    setCookie('access_token', data["access_token"], { path: '/' })
+                    setCookie('refresh_token', data["refresh_token"], { path: '/' });
+                    history.replace("/list");
                 }
                 else {
                     alert("실패");
