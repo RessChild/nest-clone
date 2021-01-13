@@ -1,7 +1,7 @@
 import { ExtractJwt, Strategy, VerifiedCallback } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
-import { jwtConstants } from 'src/constants';
+import { jwtConstants } from '../constants';
 
 // jwt 접근법
 @Injectable()

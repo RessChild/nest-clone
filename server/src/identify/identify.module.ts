@@ -10,7 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from 'src/constants';
 
 import { JwtStrategy } from '../strategy/jwt.strategy';
-import { RefreshStrategy } from 'src/strategy/refresh.strategy';
+import { RefreshStrategy } from '../strategy/refresh.strategy';
 
 // passport 모듈 선언
 @Module({

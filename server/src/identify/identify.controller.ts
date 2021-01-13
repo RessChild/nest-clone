@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from 'src/AuthGuard/JwtAuthGuard';
-import { RefreshAuthGuard } from 'src/AuthGuard/RefreshAuthGuard';
+import { JwtAuthGuard } from '../AuthGuard/JwtAuthGuard';
+import { RefreshAuthGuard } from '../AuthGuard/RefreshAuthGuard';
 import { IdentifyService } from './identify.service';
 
 @Controller('/api/identify')
@@ -48,5 +48,9 @@ export class IdentifyController {
     abc(@Request() req){
         console.log('jwt auth', req.user);
         return 'abc';
+    }
+
+    test() {
+        return "hello";
     }
 }
